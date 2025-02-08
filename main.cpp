@@ -1,6 +1,10 @@
 #include "graphics.h"
 #include "mesh.h"
 
+#include <vector>
+
+#define CUBES_SIZE 40
+
 int main(int argc, char *argv[])
 {
   Graphics& graphics = Graphics::getInstance();
@@ -8,35 +12,27 @@ int main(int argc, char *argv[])
 
   Shader cubeShader{"shaders/vertex.glsl", "shaders/fragment.glsl"};
 
-  Cube cube1;
-  Cube cube2;
-  Cube cube3;
+  std::vector<std::vector<Mesh*>*> cubes;
 
-  Mesh cubeMesh1(cube1);
-  Mesh cubeMesh2(cube2);
-  Mesh cubeMesh3(cube3);
-
-  cubeMesh2.translate({-1.5f, 3.0f, -10.0f});
-  cubeMesh3.translate({3.0f, 1.0f, -5.0f});
-
-  float lastFrameTime = 0.0f;
-  float rotationSpeed = 1.0f;
-  
+  for(int i = 0; i < CUBES_SIZE; i++)
+  {
+    cubes.push_back(new std::vector<Mesh*>());
+    for(int j = 0; j < CUBES_SIZE; j++)
+    {
+      cubes.at(i)->push_back(new Mesh{Cube()});
+      cubes.at(i)->at(j)->translate(glm::vec3{(float)-i, 0.0f, (float)-j - 0.5f});
+    }
+  }
+ 
   while(!glfwWindowShouldClose(graphics.getWindow()))
   {
     graphics.beginFrame();
 
-    float currentTime = glfwGetTime();
-    float deltaTime = currentTime - lastFrameTime;
-    lastFrameTime = currentTime;
-
-    cubeMesh1.rotate({1.0f, 1.0f, 1.0f}, rotationSpeed * deltaTime);
-    cubeMesh2.rotate({1.0f, 0.2f, 0.2f}, rotationSpeed * 0.5f * deltaTime);
-
-    graphics.renderMesh(cubeMesh1, cubeShader);
-    graphics.renderMesh(cubeMesh2, cubeShader);
-    graphics.renderMesh(cubeMesh3, cubeShader);
-
+    for(int i = 0 < CUBES_SIZE; i < CUBES_SIZE; i++) 
+      for(int j = 0; j < CUBES_SIZE; j++)
+        graphics.renderMesh(*cubes.at(i)->at(j), cubeShader);
+  
+    graphics.debugFrame();
     graphics.endFrame();
   }
 
@@ -44,4 +40,3 @@ int main(int argc, char *argv[])
 
   return 0;
 }
-
